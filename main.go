@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"cdc-sec/auth"
-	"cdc-sec/consumer"
+
+	"github.com/lagigliaivan/cdcsec/auth"
+	"github.com/lagigliaivan/cdcsec/consumer"
 )
 
 func main() {
@@ -26,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	// 4. Build CDC-Sec contract with real token
+	// 4. Build github.com/lagigliaivan/cdcsec contract with real token
 	builder := consumer.NewContract("PaymentService", "UserService")
 	contract := builder.
 		Requesting("GET", "/api/v1/user/profile").
@@ -37,5 +38,5 @@ func main() {
 		}).
 		Build()
 
-	fmt.Printf("Generated CDC-Sec Contract with signed token:\nAuthorization: Bearer %s...\n", signedToken[:30])
+	fmt.Printf("Generated github.com/lagigliaivan/cdcsec Contract with signed token:\nAuthorization: Bearer %s...\n", signedToken[:30])
 }

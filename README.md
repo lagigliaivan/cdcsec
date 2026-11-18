@@ -1,4 +1,4 @@
-1. Core Principles of CDC-Sec
+1. Core Principles of github.com/lagigliaivan/cdcsec
 Shift Security Left: Integrates security guarantees directly into the CI/CD pipeline alongside traditional contract tests.
 
 Prevent Security Drift: Ensures that microservice refactoring doesn't silently remove security controls (like CORS settings, authentication, or anti-clickjacking headers).

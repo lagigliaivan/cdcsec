@@ -1,8 +1,9 @@
 package consumer
 
 import (
-	"cdc-sec/contract"
 	"os"
+
+	"github.com/lagigliaivan/cdcsec/contract"
 )
 
 type ContractBuilder struct {

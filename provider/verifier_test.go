@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"cdc-sec/contract"
-	"cdc-sec/provider"
+	"github.com/lagigliaivan/cdcsec/contract"
+	"github.com/lagigliaivan/cdcsec/provider"
 )
 
 func TestVerifySecurityContract(t *testing.T) {
@@ -26,7 +26,7 @@ func TestVerifySecurityContract(t *testing.T) {
 
 	if !result.Passed {
 		for _, errStr := range result.Errors {
-			t.Errorf("CDC-Sec Failure: %s", errStr)
+			t.Errorf("github.com/lagigliaivan/cdcsec Failure: %s", errStr)
 		}
 	}
 }

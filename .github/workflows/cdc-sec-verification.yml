@@ -1,4 +1,4 @@
-name: CDC-Sec Verification Pipeline
+name: github.com/lagigliaivan/cdcsec Verification Pipeline
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - name: Upload Contract Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cdc-sec-contracts
+          name: github.com/lagigliaivan/cdcsec-contracts
           path: contracts/*.json
 
   # Step 2: Verify Provider against Contract
@@ -47,9 +47,9 @@ jobs:
       - name: Download Contract Artifact
         uses: actions/download-artifact@v4
         with:
-          name: cdc-sec-contracts
+          name: github.com/lagigliaivan/cdcsec-contracts
           path: contracts/
 
-      - name: Run Provider CDC-Sec Verification
+      - name: Run Provider github.com/lagigliaivan/cdcsec Verification
         run: |
           go test -v ./provider/... -run TestVerifySecurityContract

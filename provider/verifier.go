@@ -1,20 +1,20 @@
 package provider
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"crypto/rsa"
 
-	"github.com/golang-jwt/jwt/v5"
 	"strings"
 
-	"cdc-sec/contract"
+	"github.com/golang-jwt/jwt/v5"
 
+	"github.com/lagigliaivan/cdcsec/contract"
 )
-
 
 type VerificationResult struct {
 	Passed bool
@@ -117,7 +117,6 @@ func extractJWTClaims(tokenString string) (map[string]interface{}, error) {
 
 	return claims, nil
 }
-
 
 // VerifyJWTSignature validates both signature and claim matches
 func VerifyJWTSignature(tokenStr string, pubKey interface{}, expectedClaims map[string]string) error {
