@@ -1,0 +1,72 @@
+package provider
+
+import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+
+	"cdc-sec/contract"
+)
+
+type VerificationResult struct {
+	Passed bool
+	Errors []string
+}
+
+type Verifier struct {
+	targetHandler http.Handler
+}
+
+func NewVerifier(handler http.Handler) *Verifier {
+	return &Verifier{targetHandler: handler}
+}
+
+func (v *Verifier) VerifyContract(c contract.SecurityContract) VerificationResult {
+	res := VerificationResult{Passed: true}
+
+	// 1. Verify Unauthenticated Behavior (if Auth Required)
+	if c.Expectations.AuthRequired {
+		req := httptest.NewRequest(c.Request.Method, c.Request.Path, nil)
+		rec := httptest.NewRecorder()
+
+		v.targetHandler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized && rec.Code != http.StatusForbidden {
+			res.Passed = false
+			res.Errors = append(res.Errors, fmt.Sprintf(
+				"[FAIL] Auth Enforcement: Expected status 401/403 without token, got %d", rec.Code,
+			))
+		}
+	}
+
+	// 2. Verify Security Headers & Success Path
+	req := httptest.NewRequest(c.Request.Method, c.Request.Path, nil)
+	for k, val := range c.Request.Headers {
+		req.Header.Set(k, val)
+	}
+	rec := httptest.NewRecorder()
+	v.targetHandler.ServeHTTP(rec, req)
+
+	// Check Required Headers
+	for _, h := range c.Expectations.RequiredHeaders {
+		if rec.Header().Get(h) == "" {
+			res.Passed = false
+			res.Errors = append(res.Errors, fmt.Sprintf(
+				"[FAIL] Security Header Missing: Required response header '%s' was not present", h,
+			))
+		}
+	}
+
+	// Check Forbidden Headers (e.g., Information Leakage)
+	for _, h := range c.Expectations.ForbiddenHeaders {
+		if rec.Header().Get(h) != "" {
+			res.Passed = false
+			res.Errors = append(res.Errors, fmt.Sprintf(
+				"[FAIL] Security Violation: Response contained forbidden header '%s': %s", h, rec.Header().Get(h),
+			))
+		}
+	}
+
+	return res
+}

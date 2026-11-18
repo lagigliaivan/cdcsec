@@ -1,0 +1,55 @@
+name: CDC-Sec Verification Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Step 1: Run Consumer Contract Generation
+  generate-contract:
+    name: Generate Security Contract (Consumer)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Consumer Contract Tests
+        run: |
+          go test -v ./consumer/... -run TestGenerateContract
+
+      - name: Upload Contract Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdc-sec-contracts
+          path: contracts/*.json
+
+  # Step 2: Verify Provider against Contract
+  verify-provider:
+    name: Verify Security Contract (Provider)
+    needs: generate-contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Download Contract Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cdc-sec-contracts
+          path: contracts/
+
+      - name: Run Provider CDC-Sec Verification
+        run: |
+          go test -v ./provider/... -run TestVerifySecurityContract
